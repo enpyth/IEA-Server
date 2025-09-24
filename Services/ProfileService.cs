@@ -1,4 +1,5 @@
 using api_demo.Models;
+using api_demo.Dtos.Users;
 using Supabase.Postgrest;
 
 namespace api_demo.Services
@@ -19,7 +20,7 @@ namespace api_demo.Services
             try
             {
                 var response = await _supabaseClient
-                    .From<Profile>()
+                    .From<Profiles>()
                     .Get();
                 
                 return response.Models?.Select(p => p.ToDto()) ?? Enumerable.Empty<ProfileDto>();
@@ -36,7 +37,7 @@ namespace api_demo.Services
             try
             {
                 var response = await _supabaseClient
-                    .From<Profile>()
+                    .From<Profiles>()
                     .Filter("id", Constants.Operator.Equals, id.ToString())
                     .Get();
                 
@@ -54,7 +55,7 @@ namespace api_demo.Services
         {
             try
             {
-                var profile = new Profile
+                var profile = new Profiles
                 {
                     Id = Guid.NewGuid(),
                     Role = createDto.Role,
@@ -62,7 +63,7 @@ namespace api_demo.Services
                 };
 
                 var response = await _supabaseClient
-                    .From<Profile>()
+                    .From<Profiles>()
                     .Insert(profile);
                 
                 var createdProfile = response.Models?.FirstOrDefault();
@@ -95,7 +96,7 @@ namespace api_demo.Services
                     return null;
                 }
 
-                var updateProfile = new Profile
+                var updateProfile = new Profiles
                 {
                     Id = id,
                     Role = updateDto.Role ?? profile.Role,
@@ -103,7 +104,7 @@ namespace api_demo.Services
                 };
 
                 await _supabaseClient
-                    .From<Profile>()
+                    .From<Profiles>()
                     .Filter("id", Constants.Operator.Equals, id.ToString())
                     .Update(updateProfile);
                 
@@ -121,7 +122,7 @@ namespace api_demo.Services
             try
             {
                 await _supabaseClient
-                    .From<Profile>()
+                    .From<Profiles>()
                     .Filter("id", Constants.Operator.Equals, id.ToString())
                     .Delete();
                 
@@ -138,16 +139,32 @@ namespace api_demo.Services
         {
             try
             {
+                // Convert string userId to Guid for proper database query
+                var userIdGuid = Guid.Parse(userId);
+                Console.WriteLine($"[ProfileService] Looking for user with ID: {userIdGuid}");
+                
                 var response = await _supabaseClient
-                    .From<Profile>()
-                    .Filter("id", Constants.Operator.Equals, userId)
+                    .From<Profiles>()
+                    .Where(p => p.Id == userIdGuid)
                     .Get();
                 
+                Console.WriteLine($"[ProfileService] Found {response.Models?.Count ?? 0} profiles");
+                
                 var profile = response.Models?.FirstOrDefault();
+                if (profile != null)
+                {
+                    Console.WriteLine($"[ProfileService] Found profile: {profile.Email}, Role: {profile.Role}");
+                }
+                else
+                {
+                    Console.WriteLine($"[ProfileService] No profile found for user {userIdGuid}");
+                }
+                
                 return profile?.ToDto();
             }
             catch (Exception ex)
             {
+                Console.WriteLine($"[ProfileService] Exception: {ex.Message}");
                 _logger.LogError(ex, "Error getting current user profile: {UserId}", userId);
                 throw;
             }

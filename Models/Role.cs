@@ -2,8 +2,7 @@ namespace api_demo.Models
 {
     public enum Role
     {
-        Visitor,
-        AuthenticatedUser,
+        Member,
         Enterprise,
         Expert,
         Admin

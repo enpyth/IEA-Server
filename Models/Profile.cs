@@ -1,31 +1,28 @@
 using System.ComponentModel.DataAnnotations;
-using System.Text.Json.Serialization;
 using Supabase.Postgrest.Models;
 using Supabase.Postgrest.Attributes;
 
 namespace api_demo.Models
 {
     [Table("profiles")]
-    public class Profile : BaseModel
+    public class Profiles : BaseModel
     {
         [PrimaryKey("id")]
         public Guid Id { get; set; }
-        
-        [Column("role")]
-        [Required]
-        [EnumDataType(typeof(UserRole))]
-        public UserRole Role { get; set; }
-        
+
         [Column("email")]
         [Required]
         [EmailAddress]
         public string Email { get; set; } = string.Empty;
-    }
 
-    public enum UserRole
-    {
-        Expert,
-        Visitor,
-        Enterprise
+        [Column("role")]
+        [Required]
+        public Role Role { get; set; } = Role.Member;
+
+        [Column("created_at")]
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+        [Column("updated_at")]
+        public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
     }
 }

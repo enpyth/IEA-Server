@@ -1,4 +1,5 @@
 using api_demo.Models;
+using api_demo.Dtos.Users;
 using api_demo.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -35,7 +36,7 @@ namespace api_demo.Controllers
 
         // GET: api/me/profile
         [HttpGet("profile")]
-        public async Task<ActionResult<Profile>> GetMyProfile()
+        public async Task<ActionResult<Profiles>> GetMyProfile()
         {
             try
             {
@@ -58,7 +59,7 @@ namespace api_demo.Controllers
 
         // PUT: api/me/profile
         [HttpPut("profile")]
-        public async Task<ActionResult<Profile>> UpdateMyProfile(UpdateProfileDto updateDto)
+        public async Task<ActionResult<Profiles>> UpdateMyProfile(UpdateProfileDto updateDto)
         {
             try
             {

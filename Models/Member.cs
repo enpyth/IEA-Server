@@ -1,10 +1,10 @@
-using Supabase.Postgrest.Models;
 using Supabase.Postgrest.Attributes;
+using Supabase.Postgrest.Models;
 
 namespace api_demo.Models
 {
-    [Table("admins")]
-    public class Admin : BaseModel
+    [Table("members")]
+    public class Member : BaseModel
     {
         [PrimaryKey("id")]
         public Guid Id { get; set; }

@@ -1,17 +1,19 @@
 using System.ComponentModel.DataAnnotations;
+using Supabase.Postgrest.Models;
+using Supabase.Postgrest.Attributes;
 
 namespace api_demo.Models
 {
-    public class Expert : User
+    [Table("experts")]
+    public class Expert : BaseModel
     {
+        [PrimaryKey("id")]
+        public Guid Id { get; set; }
+
+        [Column("expertise_area")]
         [Required]
         [StringLength(200)]
         public string ExpertiseArea { get; set; } = string.Empty;
-
-        public Expert()
-        {
-            Role = Role.Expert;
-        }
     }
 }
 

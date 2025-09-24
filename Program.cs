@@ -52,6 +52,14 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("AdminPolicy", policy =>
         policy.Requirements.Add(new AdminRequirement()));
     
+    // Policy for expert access (Experts and Admins)
+    options.AddPolicy("ExpertPolicy", policy =>
+        policy.Requirements.Add(new ExpertRequirement()));
+    
+    // Policy for enterprise access (Enterprises and Admins)
+    options.AddPolicy("EnterprisePolicy", policy =>
+        policy.Requirements.Add(new EnterpriseRequirement()));
+    
     // Policy for authenticated users
     options.AddPolicy("AuthenticatedUser", policy =>
         policy.RequireAuthenticatedUser());
@@ -59,12 +67,15 @@ builder.Services.AddAuthorization(options =>
 
 // Register Authorization Handlers
 builder.Services.AddScoped<IAuthorizationHandler, AdminAuthorizationHandler>();
+builder.Services.AddScoped<IAuthorizationHandler, ExpertAuthorizationHandler>();
+builder.Services.AddScoped<IAuthorizationHandler, EnterpriseAuthorizationHandler>();
 
-// Configure Supabase Client
+// Configure Supabase Client (use Service Role key to bypass RLS for server-side operations)
 builder.Services.AddSingleton<Client>(provider =>
 {
     var url = supabaseConfig.Url;
-    var key = supabaseConfig.AnonKey;
+    // var key = supabaseConfig.AnonKey;
+    var key = supabaseConfig.ServiceKey;
     
     var options = new SupabaseOptions
     {
@@ -72,11 +83,13 @@ builder.Services.AddSingleton<Client>(provider =>
         AutoConnectRealtime = true
     };
     
-    return new Client(url, key, options);
+    var client = new Client(url, key, options);
+    return client;
 });
 
 // Register Services
 builder.Services.AddScoped<IProfileService, ProfileService>();
+builder.Services.AddScoped<IAcademicProductService, AcademicProductService>();
 
 var app = builder.Build();
 

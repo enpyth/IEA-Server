@@ -1,4 +1,5 @@
 using api_demo.Models;
+using api_demo.Dtos.Users;
 
 namespace api_demo.Services
 {

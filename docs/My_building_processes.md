@@ -13,7 +13,9 @@ vibe coding files in /Models
 
 /Dtos
 
-3. Add a database context
+3. Database context (delete)
+
+The database context is the main class that coordinates Entity Framework functionality for a data model. 
 
 use DI declare what kind of db want to use in main file
 
