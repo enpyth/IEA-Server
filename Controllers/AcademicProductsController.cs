@@ -90,7 +90,6 @@ namespace api_demo.Controllers
         [HttpPost]
         [ProducesResponseType(typeof(AcademicProductDto), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [Authorize(Policy = "ExpertPolicy")]
         public async Task<ActionResult<AcademicProductDto>> CreateAcademicProduct([FromBody] CreateAcademicProductDto createDto)
         {
@@ -98,31 +97,7 @@ namespace api_demo.Controllers
             {
                 // Get current user ID and use it as ExpertId
                 var currentUserId = GetCurrentUserId();
-                
-                // Log auth.uid() and expert_id for debugging
-                Console.WriteLine($"[POST AcademicProduct] auth.uid(): {currentUserId}");
-                Console.WriteLine($"[POST AcademicProduct] expert_id: {currentUserId}");
-                
-                // First verify that the user has 'expert' role in profiles table
                 var userIdGuid = Guid.Parse(currentUserId);
-                var profileResponse = await _supabase
-                    .From<Profiles>()
-                    .Where(p => p.Id == userIdGuid)
-                    .Single();
-                
-                if (profileResponse == null)
-                {
-                    Console.WriteLine($"[POST AcademicProduct] User {currentUserId} profile not found");
-                    return StatusCode(403, "User profile not found");
-                }
-                
-                Console.WriteLine($"[POST AcademicProduct] Found profile: {profileResponse.Email}, Role: {profileResponse.Role}");
-                
-                if (profileResponse.Role != Role.Expert)
-                {
-                    Console.WriteLine($"[POST AcademicProduct] User {currentUserId} role is {profileResponse.Role}, not Expert");
-                    return StatusCode(403, $"Only experts can create academic products. Current role: {profileResponse.Role}");
-                }
                 
                 var productDto = await _academicProductService.CreateAcademicProductAsync(createDto, userIdGuid);
                 return CreatedAtAction(nameof(GetAcademicProduct), new { id = productDto.Id }, productDto);
